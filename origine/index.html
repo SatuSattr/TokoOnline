@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TokoOnline - Belanja Online Terpercaya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#ffffff",
+              secondary: "#a3a3a3",
+              accent: "#3b82f6",
+              dark: "#0a0a0a",
+              "dark-light": "#1a1a1a",
+            },
+          },
+        },
+      };
+    </script>
+    <!-- Alpine.js -->
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+  </head>
+  <body class="bg-dark text-primary">
+    <!-- Navigation -->
+    <nav class="bg-dark-light border-b border-gray-800 sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center space-x-8">
+            <a href="index.html" class="text-2xl font-bold">TokoOnline</a>
+            <div class="hidden md:flex space-x-6">
+              <a
+                href="index.html"
+                class="text-primary hover:text-accent transition"
+                >Home</a
+              >
+              <a
+                href="products.html"
+                class="text-secondary hover:text-accent transition"
+                >Products</a
+              >
+              <a href="#" class="text-secondary hover:text-accent transition"
+                >Categories</a
+              >
+              <a href="#" class="text-secondary hover:text-accent transition"
+                >Deals</a
+              >
+            </div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <button
+              class="relative text-secondary hover:text-primary transition"
+            >
+              <i class="fas fa-shopping-cart text-2xl"></i>
+              <span
+                class="absolute -top-[6px] -right-1 bg-accent text-white text-[10px] rounded-full px-1 py-0.5"
+                >17</span
+              >
+            </button>
+            <a
+              href="auth.html"
+              class="bg-primary text-dark px-4 py-2 rounded-lg hover:bg-gray-200 transition font-medium"
+            >
+              Login
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section with Search -->
+    <section class="py-20 px-4 relative">
+      <div
+        class="absolute inset-0 bg-[url('public/hero.jpg')] bg-cover bg-center brightness-[17%]"
+      ></div>
+      <div class="relative max-w-4xl mx-auto text-center z-10">
+        <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+          Find the Best<br />
+          Product for You
+        </h1>
+        <p class="text-secondary text-lg mb-10 max-w-2xl mx-auto">
+          Shop online easily and safely. Thousands of quality products at the
+          best prices await you.
+        </p>
+
+        <!-- Search Bar -->
+        <div x-data="productData" class="max-w-2xl mx-auto">
+          <div class="relative">
+            <input
+              type="text"
+              x-model="searchInput"
+              placeholder="Search product, category, or brand..."
+              class="w-full px-6 py-4 bg-dark-light border border-gray-800 rounded-xl text-primary placeholder-secondary focus:outline-none focus:border-accent transition"
+              @keypress="handleSearch"
+            />
+            <button
+              class="absolute right-2 top-1/2 -translate-y-1/2 bg-primary text-dark px-6 py-2 rounded-lg hover:bg-gray-200 transition font-medium"
+            >
+              <i class="fas fa-search mr-2"></i>Search
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Categories -->
+        <div
+          x-data="productData"
+          class="flex flex-wrap justify-center gap-3 mt-8"
+        >
+          <template x-for="category in categories" :key="category.id">
+            <button
+              class="px-4 py-2 bg-dark-light border border-gray-800 rounded-lg hover:border-accent transition text-sm"
+              x-text="category.displayName"
+              @click="window.location.href = `products.html?category=${category.name}`"
+            ></button>
+          </template>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="py-16 px-4 bg-dark-light">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex justify-between items-center mb-10">
+          <h2 class="text-3xl font-bold">Featured Products</h2>
+          <a href="products.html" class="text-accent hover:underline"
+            >View All <i class="fas fa-arrow-right ml-1"></i
+          ></a>
+        </div>
+
+        <!-- Product Grid -->
+        <div
+          x-data="productData"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
+          <template x-for="product in filteredProducts" :key="product.id">
+            <div
+              class="bg-[#212121] border border-gray-800 rounded-xl overflow-hidden hover:border-accent transition group cursor-pointer"
+              @click="window.location.href = `product-detail.html?id=${product.id}`"
+            >
+              <div class="aspect-square overflow-hidden bg-dark">
+                <img
+                  :src="product.image"
+                  :alt="product.name"
+                  class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                />
+              </div>
+              <div class="p-4">
+                <div
+                  class="text-accent text-sm mb-2 capitalize"
+                  x-text="product.category"
+                ></div>
+                <h3
+                  class="font-semibold mb-2 line-clamp-2"
+                  x-text="product.name"
+                ></h3>
+                <div class="flex items-center mb-3">
+                  <div
+                    class="flex text-yellow-500 text-sm mr-2"
+                    x-html="generateStars(product.rating)"
+                  ></div>
+                  <span
+                    class="text-secondary text-sm"
+                    x-text="`(${product.reviews})`"
+                  ></span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <div class="flex flex-col">
+                    <template
+                      x-if="product.disc_price > 0 && product.disc_price < product.price"
+                    >
+                      <div class="flex items-center gap-2">
+                        <span
+                          class="text-2xl font-bold text-red-500"
+                          x-text="`${product.disc_price.toFixed(2)}`"
+                        ></span>
+                        <span
+                          class="text-lg line-through text-secondary"
+                          x-text="`${product.price.toFixed(2)}`"
+                        ></span>
+                        <span
+                          class="bg-red-500 text-white text-sm px-2 py-1 rounded"
+                          x-text="`-${Math.round(((product.price - product.disc_price) / product.price) * 100)}%`"
+                        ></span>
+                      </div>
+                    </template>
+                    <template
+                      x-if="!(product.disc_price > 0 && product.disc_price < product.price)"
+                    >
+                      <span
+                        class="text-2xl font-bold"
+                        x-text="`${product.price.toFixed(2)}`"
+                      ></span>
+                    </template>
+                  </div>
+                  <button
+                    class="bg-primary text-dark w-10 h-10 rounded-lg hover:bg-gray-200 transition"
+                    @click.stop="addToCart(product.id)"
+                  >
+                    <i class="fas fa-shopping-cart"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark-light border-t border-gray-800 py-12 px-4">
+      <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          <div>
+            <h3 class="text-xl font-bold mb-4">TokoOnline</h3>
+            <p class="text-secondary text-sm">
+              Your trusted online shopping destination for quality products at
+              the best prices.
+            </p>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-4">Shop</h4>
+            <ul class="space-y-2 text-secondary text-sm">
+              <li>
+                <a href="#" class="hover:text-primary transition"
+                  >All Products</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-primary transition">Categories</a>
+              </li>
+              <li>
+                <a href="#" class="hover:text-primary transition">Deals</a>
+              </li>
+              <li>
+                <a href="#" class="hover:text-primary transition"
+                  >New Arrivals</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-4">Support</h4>
+            <ul class="space-y-2 text-secondary text-sm">
+              <li>
+                <a href="#" class="hover:text-primary transition"
+                  >Help Center</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-primary transition"
+                  >Shipping Info</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-primary transition">Returns</a>
+              </li>
+              <li>
+                <a href="#" class="hover:text-primary transition">Contact Us</a>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-4">Follow Us</h4>
+            <div class="flex space-x-4">
+              <a href="#" class="text-secondary hover:text-primary transition"
+                ><i class="fab fa-facebook text-xl"></i
+              ></a>
+              <a href="#" class="text-secondary hover:text-primary transition"
+                ><i class="fab fa-instagram text-xl"></i
+              ></a>
+              <a href="#" class="text-secondary hover:text-primary transition"
+                ><i class="fab fa-twitter text-xl"></i
+              ></a>
+              <a href="#" class="text-secondary hover:text-primary transition"
+                ><i class="fab fa-youtube text-xl"></i
+              ></a>
+            </div>
+          </div>
+        </div>
+        <div
+          class="border-t border-gray-800 pt-8 text-center text-secondary text-sm"
+        >
+          <p>&copy; 2025 TokoOnline. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="js/products.js"></script>
+    <script src="js/main.js"></script>
+
+    <!-- Alpine.js Implementation -->
+    <script>
+      document.addEventListener("alpine:init", () => {
+        Alpine.data("productData", () => ({
+          products: alpineProducts,
+          categories: alpineCategories,
+          searchInput: "",
+          filteredProducts: [],
+
+          init() {
+            // Set initial featured products
+            this.filteredProducts = this.featuredProducts();
+
+            // Watch for changes in searchInput
+            this.$watch("searchInput", () => {
+              this.updateSearch();
+            });
+          },
+
+          featuredProducts() {
+            // Sort products by rating in descending order and take the top 8
+            return [...this.products]
+              .sort((a, b) => b.rating - a.rating)
+              .slice(0, 8);
+          },
+
+          updateSearch() {
+            if (!this.searchInput) {
+              this.filteredProducts = this.featuredProducts();
+            } else {
+              const term = this.searchInput.toLowerCase();
+              this.filteredProducts = this.products
+                .filter(
+                  (product) =>
+                    product.name.toLowerCase().includes(term) ||
+                    product.description.toLowerCase().includes(term)
+                )
+                .slice(0, 8);
+            }
+          },
+
+          handleSearch(e) {
+            if (e.key === "Enter") {
+              const searchTerm = this.searchInput.toLowerCase();
+              window.location.href = `products.html?search=${encodeURIComponent(
+                searchTerm
+              )}`;
+            }
+          },
+
+          searchProductsByCategory(categoryName) {
+            this.searchInput = "";
+            return this.products.filter(
+              (product) => product.category === categoryName
+            );
+          },
+
+          // Function for star rating display - needed for Alpine templates
+          generateStars(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 !== 0;
+            let stars = "";
+
+            for (let i = 0; i < fullStars; i++) {
+              stars += '<i class="fas fa-star"></i>';
+            }
+
+            if (hasHalfStar) {
+              stars += '<i class="fas fa-star-half-alt"></i>';
+            }
+
+            const emptyStars = 5 - Math.ceil(rating);
+            for (let i = 0; i < emptyStars; i++) {
+              stars += '<i class="far fa-star"></i>';
+            }
+
+            return stars;
+          },
+
+          // Add to cart function
+          addToCart(productId) {
+            alert(`Product ${productId} added to cart!`);
+          },
+        }));
+      });
+    </script>
+  </body>
+</html>
