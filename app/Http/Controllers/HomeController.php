@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Routing\Controller as BaseController;
+use App\Models\Category;
+use App\Models\Product;
+use Illuminate\Http\Request;
+
+class HomeController extends BaseController
+{
+    public function index()
+    {
+        // Get all categories
+        $categories = Category::all();
+        
+        // Get featured products (top 8 by rating)
+        $featuredProducts = Product::with('category')
+            ->orderBy('rating', 'desc')
+            ->limit(8)
+            ->get();
+
+        return view('index', compact('categories', 'featuredProducts'));
+    }
+    
+    public function search(Request $request)
+    {
+        $search = $request->input('search');
+        
+        // Get all categories for the view
+        $categories = Category::all();
+        
+        // Search products by name or description
+        $featuredProducts = Product::with('category')
+            ->where(function($query) use ($search) {
+                $query->where('name', 'LIKE', "%{$search}%")
+                      ->orWhere('description', 'LIKE', "%{$search}%");
+            })
+            ->orderBy('rating', 'desc')
+            ->limit(8)
+            ->get();
+
+        return view('index', compact('categories', 'featuredProducts', 'search'));
+    }
+}
