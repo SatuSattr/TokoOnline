@@ -225,7 +225,7 @@
 
                         <button @click="proceedToCheckout" :disabled="selectedCount === 0"
                             :class="{
-                                'opacity-50 cursor-not-allowed': selectedCount ===
+                                'bg-primary/70 cursor-not-allowed': selectedCount ===
                                     0,
                                 'bg-primary hover:bg-gray-200': selectedCount > 0
                             }"
@@ -457,5 +457,11 @@
                 }
             }
         }
+
+        @auth
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+        });
+        @endauth
     </script>
 </x-app-layout>

@@ -180,6 +180,17 @@ class Product extends Model
      */
     public function getFormattedPriceAttribute(): string
     {
+        if ($this->disc_price && $this->disc_price < $this->price) {
+            return 'Rp' . number_format($this->disc_price, 0, ',', '.');
+        }
+        return 'Rp' . number_format($this->price, 0, ',', '.');
+    }
+    
+    /**
+     * Get original price formatted as Indonesian Rupiah.
+     */
+    public function getFormattedOriginalPriceAttribute(): string
+    {
         return 'Rp' . number_format($this->price, 0, ',', '.');
     }
 }

@@ -15,6 +15,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // Public routes
 Route::get('/products', [HomeController::class, 'products'])->name('products.index');
 Route::get('/products/search', [HomeController::class, 'search'])->name('products.search');
+Route::get('/products/{product}', [HomeController::class, 'product'])->name('products.show');
 
 // Authenticated user routes
 Route::middleware(['auth'])->group(function () {

@@ -53,4 +53,15 @@ class HomeController extends BaseController
 
         return view('products.index', compact('products', 'categories'));
     }
+    
+    public function product(Product $product)
+    {
+        // Get related products (same category, excluding current product)
+        $relatedProducts = Product::where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->limit(4)
+            ->get();
+
+        return view('products.show', compact('product', 'relatedProducts'));
+    }
 }

@@ -1,7 +1,7 @@
 @props(['product'])
 
 <div class="relative flex w-full max-w-xs max-h-[434px] flex-col overflow-hidden rounded-lg border border-gray-800 bg-[#212121] shadow-md hover:border-accent transition group cursor-pointer"
-    onclick="window.location.href = `product-detail.html?id={{ $product->id }}`">
+    onclick="window.location.href = `/products/{{ $product->id }}`">
     <a class="relative mx-3 mt-3 flex min-h-60 overflow-hidden rounded-xl" href="#">
         @if ($product->image)
             <img src="{{ $product->image }}" alt="{{ $product->name }}" class="object-cover w-full h-full"

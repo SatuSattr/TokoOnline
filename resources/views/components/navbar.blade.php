@@ -4,14 +4,14 @@
             <div class="flex items-center space-x-8">
                 <a href="{{ url('/') }}" class="text-2xl font-bold text-white">TokoOnline</a>
                 <div class="hidden md:flex space-x-6">
-                    <a href="{{ url('/') }}" class="text-primary hover:text-accent transition">Home</a>
-                    <a href="{{ url('/products') }}" class="text-secondary hover:text-accent transition">Products</a>
+                    <a href="{{ url('/') }}"
+                        class="{{ request()->is('/') ? 'text-primary' : 'text-neutral-400' }} hover:text-primary transition">Home</a>
+                    <a href="{{ url('/products') }}"
+                        class="{{ request()->is('products*') ? 'text-primary' : 'text-neutral-400' }} hover:text-primary transition">Products</a>
                     @auth
-                        <a href="{{ route('dashboard') }}"
-                            class="text-secondary hover:text-accent transition {{ request()->routeIs('dashboard') ? 'text-accent' : '' }}">Dashboard</a>
                         @if (auth()->user()->isAdmin())
                             <a href="{{ route('admin.dashboard') }}"
-                                class="text-secondary hover:text-accent transition {{ request()->routeIs('admin.*') ? 'text-accent' : '' }}">Admin
+                                class="{{ request()->routeIs('admin.*') ? 'text-primary' : 'text-neutral-400' }} hover:text-primary transition">Admin
                                 Dashboard</a>
                         @endif
                     @endauth
@@ -24,9 +24,9 @@
                         <div class="relative">
                             <a href="{{ route('cart.index') }}" class="text-secondary hover:text-primary transition">
                                 <i class="fas fa-shopping-cart text-2xl"></i>
-                                <span id="cart-count" 
+                                <span id="cart-count"
                                     class="absolute -top-[6px] -right-1 bg-accent text-white text-[10px] rounded-full px-1 py-0.5">
-                                    0
+                                    {{ $cartCount ?? 0 }}
                                 </span>
                             </a>
                         </div>
@@ -59,7 +59,7 @@
                     <div class="relative">
                         <a href="/login" class="text-secondary hover:text-primary transition">
                             <i class="fas fa-shopping-cart text-2xl"></i>
-                            <span 
+                            <span
                                 class="absolute -top-[6px] -right-1 bg-accent text-white text-[10px] rounded-full px-1 py-0.5">
                                 0
                             </span>
@@ -73,20 +73,20 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const dropdownButton = document.getElementById('dropdown-button');
             const dropdownMenu = document.getElementById('dropdown-menu');
             let isOpen = false;
-            
+
             // Toggle dropdown on button click
             dropdownButton.addEventListener('click', function(e) {
                 e.preventDefault();
                 isOpen = !isOpen;
                 dropdownMenu.classList.toggle('hidden', !isOpen);
             });
-            
+
             // Close dropdown when clicking outside
             document.addEventListener('click', function(e) {
                 const dropdownContainer = document.getElementById('profile-dropdown');
@@ -95,6 +95,8 @@
                     dropdownMenu.classList.add('hidden');
                 }
             });
+
+
         });
     </script>
 </nav>
