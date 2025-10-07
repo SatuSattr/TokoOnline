@@ -29,6 +29,7 @@
                                 <th class="px-6 py-4 text-left text-xs font-medium text-secondary uppercase tracking-wider">ID</th>
                                 <th class="px-6 py-4 text-left text-xs font-medium text-secondary uppercase tracking-wider">Name</th>
                                 <th class="px-6 py-4 text-left text-xs font-medium text-secondary uppercase tracking-wider">Display Name</th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-secondary uppercase tracking-wider">Product Count</th>
                                 <th class="px-6 py-4 text-left text-xs font-medium text-secondary uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
@@ -38,6 +39,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-primary">{{ $category->id }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-primary">{{ $category->name }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-primary">{{ $category->display_name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-primary">{{ $category->products_count }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                                         <a href="{{ route('admin.categories.edit', $category->id) }}" class="text-accent hover:text-accent-hover mr-3">
                                             <i class="fas fa-edit"></i> Edit

@@ -3,8 +3,9 @@
 <div class="relative flex w-full max-w-xs max-h-[434px] flex-col overflow-hidden rounded-lg border border-gray-800 bg-[#212121] shadow-md hover:border-accent transition group cursor-pointer"
     onclick="window.location.href = `product-detail.html?id={{ $product->id }}`">
     <a class="relative mx-3 mt-3 flex min-h-60 overflow-hidden rounded-xl" href="#">
-        @if ($product->first_image)
-            <img src="{{ $product->first_image }}" alt="{{ $product->name }}" class="object-cover w-full h-full" onerror="this.src='{{ asset('img/hero.jpg') }}'; this.onerror=null;" />
+        @if ($product->image)
+            <img src="{{ $product->image }}" alt="{{ $product->name }}" class="object-cover w-full h-full"
+                onerror="this.src='{{ asset('img/hero.jpg') }}'; this.onerror=null;" />
         @else
             <img src="{{ asset('img/hero.jpg') }}" alt="{{ $product->name }}" class="object-cover w-full h-full" />
         @endif
@@ -17,7 +18,9 @@
     </a>
     <div class="mt-4 px-5 pb-5 flex flex-col  justify-between h-full">
         <a href="#">
-            <h5 class="text-lg tracking-tight text-primary">{{ $product->name }}</h5>
+            <h5 class="text-lg tracking-tight text-primary" title="{{ $product->name }}">
+                {{ Str::limit($product->name, 30) }}
+            </h5>
         </a>
         <div class="mt-2 mb-5 flex justify-between">
             <p>

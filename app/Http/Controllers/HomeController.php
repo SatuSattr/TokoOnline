@@ -42,4 +42,15 @@ class HomeController extends BaseController
 
         return view('index', compact('categories', 'featuredProducts', 'search'));
     }
+    
+    public function products()
+    {
+        // Get all categories for the sidebar/filter
+        $categories = Category::all();
+        
+        // Get all products with category information
+        $products = Product::with('category')->paginate(12); // 12 products per page
+
+        return view('products.index', compact('products', 'categories'));
+    }
 }

@@ -2,31 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Http\Request;
 use App\Models\Cart;
 use App\Models\Product;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller as BaseController;
 
 class CartController extends BaseController
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function index()
     {
-        $cartItems = Cart::with('product')->where('user_id', Auth::id())->get();
+        $cartItems = Cart::with('product')->where('user_id', auth()->id())->get();
         return view('cart.index', compact('cartItems'));
     }
 
-    public function add(Request $request, $productId)
+    public function add(Request $request, Product $product)
     {
-        $product = Product::findOrFail($productId);
-        
         $cartItem = Cart::firstOrCreate(
             [
-                'user_id' => Auth::id(),
-                'product_id' => $productId,
+                'user_id' => auth()->id(),
+                'product_id' => $product->id,
             ],
             [
-                'quantity' => 1,
+                'quantity' => 1
             ]
         );
 
@@ -40,9 +42,9 @@ class CartController extends BaseController
     public function update(Request $request, $id)
     {
         $cartItem = Cart::where('id', $id)
-                        ->where('user_id', Auth::id())
-                        ->firstOrFail();
-        
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
         $cartItem->update([
             'quantity' => $request->quantity
         ]);
@@ -50,12 +52,12 @@ class CartController extends BaseController
         return response()->json(['message' => 'Cart updated successfully']);
     }
 
-    public function remove($id)
+    public function remove(Request $request, $id)
     {
         $cartItem = Cart::where('id', $id)
-                        ->where('user_id', Auth::id())
-                        ->firstOrFail();
-        
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
         $cartItem->delete();
 
         return response()->json(['message' => 'Item removed from cart']);
@@ -63,8 +65,15 @@ class CartController extends BaseController
 
     public function clear()
     {
-        Cart::where('user_id', Auth::id())->delete();
+        Cart::where('user_id', auth()->id())->delete();
 
         return response()->json(['message' => 'Cart cleared']);
+    }
+
+    public function count()
+    {
+        $count = Cart::where('user_id', auth()->id())->sum('quantity');
+
+        return response()->json(['count' => $count]);
     }
 }

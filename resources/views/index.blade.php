@@ -136,6 +136,7 @@
         </div>
     </footer>
 
+
     <script>
         // Add to cart function
         function addToCart(productId) {
@@ -152,6 +153,7 @@
                 .then(response => response.json())
                 .then(data => {
                     alert(data.message);
+                    updateCartCount();
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -159,9 +161,39 @@
                 });
             @else
                 // Redirect to login if not authenticated
+                alert('Please login to add items to cart');
                 window.location.href = '/login';
             @endauth
         }
+        
+        // Function to update cart count in navbar
+        function updateCartCount() {
+            @auth
+                fetch('/cart/count', {
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const cartCountElement = document.getElementById('cart-count');
+                    if (cartCountElement) {
+                        cartCountElement.textContent = data.count;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            @endauth
+        }
+        
+        // Update cart count on page load
+        @auth
+            document.addEventListener('DOMContentLoaded', function() {
+                updateCartCount();
+            });
+        @endauth
     </script>
 </body>
 

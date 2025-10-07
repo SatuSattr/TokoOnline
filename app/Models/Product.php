@@ -12,8 +12,11 @@ class Product extends Model
         'category_id',
         'price',
         'disc_price',
-        'images',
-        'main_image',
+        'image',
+        'image2',
+        'image3',
+        'image4',
+        'image5',
         'description',
         'rating',
         'reviews',
@@ -51,55 +54,69 @@ class Product extends Model
         return $this->hasMany(Cart::class);
     }
     
+    
     /**
-     * Accessor for images attribute
+     * Get all images as an array for compatibility
      */
     public function getImagesAttribute(): array
     {
-        $images = $this->attributes['images'] ?? '[]';
-        $imagesArray = is_string($images) ? json_decode($images, true) : $images;
-        return is_array($imagesArray) ? $imagesArray : [];
-    }
-    
-    /**
-     * Mutator for images attribute
-     */
-    public function setImagesAttribute($value): void
-    {
-        if (is_array($value)) {
-            $this->attributes['images'] = json_encode($value);
-        } elseif (is_string($value)) {
-            // If it's already a JSON string, validate it
-            $decoded = json_decode($value, true);
-            if (is_array($decoded)) {
-                $this->attributes['images'] = $value;
-            } else {
-                $this->attributes['images'] = json_encode([$value]);
+        $images = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $imageFieldName = $i === 1 ? 'image' : "image$i";
+            $imageValue = $this->attributes[$imageFieldName] ?? null;
+            if ($imageValue) {
+                $images[] = $imageValue;
             }
-        } else {
-            $this->attributes['images'] = null;
         }
+        return $images;
     }
     
     /**
-     * Get the main image path
+     * Get the primary image
      */
     public function getMainImageAttribute(): ?string
     {
-        return $this->attributes['main_image'] ?? null;
+        return $this->attributes['image'] ?? null;
     }
     
     /**
-     * Get the first image as fallback if main image is not set
+     * Get the first available image (the primary image)
      */
     public function getFirstImageAttribute(): ?string
     {
-        if ($this->main_image) {
-            return $this->main_image;
-        }
-        
-        $images = $this->images;
-        return !empty($images) ? $images[0] : null;
+        return $this->attributes['image'] ?? null;
+    }
+    
+    /**
+     * Get image2 if it exists
+     */
+    public function getImage2Attribute(): ?string
+    {
+        return $this->attributes['image2'] ?? null;
+    }
+    
+    /**
+     * Get image3 if it exists
+     */
+    public function getImage3Attribute(): ?string
+    {
+        return $this->attributes['image3'] ?? null;
+    }
+    
+    /**
+     * Get image4 if it exists
+     */
+    public function getImage4Attribute(): ?string
+    {
+        return $this->attributes['image4'] ?? null;
+    }
+    
+    /**
+     * Get image5 if it exists
+     */
+    public function getImage5Attribute(): ?string
+    {
+        return $this->attributes['image5'] ?? null;
     }
     
     /**
@@ -141,9 +158,12 @@ class Product extends Model
      */
     public function deleteAssociatedImages()
     {
-        $images = $this->images;
-        if (is_array($images)) {
-            foreach ($images as $image) {
+        // Delete all 5 image columns if they exist
+        for ($i = 1; $i <= 5; $i++) {
+            $imageFieldName = $i === 1 ? 'image' : "image$i";
+            $image = $this->attributes[$imageFieldName] ?? null;
+            
+            if ($image) {
                 // Convert URL path to storage path
                 $storagePath = str_replace('/storage/', 'public/', $image);
                 $fullPath = storage_path('app/' . $storagePath);

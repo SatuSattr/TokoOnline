@@ -33,27 +33,60 @@ class ProductController extends BaseController
             'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|min:0',
             'disc_price' => 'nullable|numeric|min:0',
-            'images' => 'required|array|max:5',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:10240', // 10MB max per image
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:10240', // Primary image is required
+            'image2' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            'image3' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            'image4' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            'image5' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
             'description' => 'nullable|string',
             'rating' => 'required|numeric|min:0|max:5',
             'reviews' => 'required|integer|min:0',
         ]);
 
-        // Handle image uploads
-        $imagePaths = [];
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                // Generate random filename
-                $filename = $this->generateRandomFilename($image->getClientOriginalExtension());
-                $path = $image->storeAs('public/img', $filename);
-                $imagePaths[] = '/storage/img/' . $filename;
+        $data = $request->except(['image', 'image2', 'image3', 'image4', 'image5']);
+
+        // Handle primary image upload
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = $this->generateRandomFilename($file->getClientOriginalExtension());
+            
+            // Check if the file was actually uploaded successfully
+            if (!$file->isValid()) {
+                return redirect()->back()->withErrors(['image' => 'File upload failed.'])->withInput();
             }
+            
+            $path = $file->storeAs('img', $filename, 'public');  // Explicitly specify 'public' disk
+            if ($path === false) {
+                return redirect()->back()->withErrors(['image' => 'Failed to save image file.'])->withInput();
+            }
+            
+            // The storeAs method stores the file in storage/app/public/img/ and returns "img/filename"
+            // The storage link makes it accessible via /storage/img/filename
+            $data['image'] = '/storage/' . $path;
         }
 
-        $data = $request->except(['images']);
-        $data['images'] = $imagePaths;
-        $data['main_image'] = !empty($imagePaths) ? $imagePaths[0] : null;
+        // Handle additional image uploads
+        for ($i = 2; $i <= 5; $i++) {
+            $imageField = "image$i";
+            if ($request->hasFile($imageField)) {
+                $file = $request->file($imageField);
+                $filename = $this->generateRandomFilename($file->getClientOriginalExtension());
+                
+                // Check if the file was actually uploaded successfully
+                if (!$file->isValid()) {
+                    return redirect()->back()->withErrors([$imageField => 'File upload failed.'])->withInput();
+                }
+                
+                $path = $file->storeAs('img', $filename, 'public');  // Explicitly specify 'public' disk
+                if ($path === false) {
+                    return redirect()->back()->withErrors([$imageField => 'Failed to save image file.'])->withInput();
+                }
+                
+                // The storeAs method stores the file in storage/app/public/img/ and returns "img/filename"
+                // The storage link makes it accessible via /storage/img/filename
+                $data[$imageField] = '/storage/' . $path;
+            }
+        }
 
         Product::create($data);
 
@@ -74,8 +107,11 @@ class ProductController extends BaseController
             'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|min:0',
             'disc_price' => 'nullable|numeric|min:0',
-            'images' => 'nullable|array|max:5',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240', // 10MB max per image
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            'image2' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            'image3' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            'image4' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            'image5' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
             'description' => 'nullable|string',
             'rating' => 'required|numeric|min:0|max:5',
             'reviews' => 'required|integer|min:0',
@@ -83,24 +119,66 @@ class ProductController extends BaseController
 
         $product = Product::findOrFail($id);
 
-        $data = $request->except(['images']);
+        $data = $request->except(['image', 'image2', 'image3', 'image4', 'image5']);
 
-        // Handle new image uploads
-        $imagePaths = $product->images; // Keep existing images
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                // Generate random filename
-                $filename = $this->generateRandomFilename($image->getClientOriginalExtension());
-                $path = $image->storeAs('public/img', $filename);
-                $imagePaths[] = '/storage/img/' . $filename;
+        // Handle primary image upload
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($product->image) {
+                $oldImagePath = str_replace('/storage/', 'public/', $product->image);
+                if (file_exists(storage_path('app/' . $oldImagePath))) {
+                    unlink(storage_path('app/' . $oldImagePath));
+                }
             }
-
-            // Limit to 5 images max
-            $imagePaths = array_slice($imagePaths, 0, 5);
+            
+            $file = $request->file('image');
+            $filename = $this->generateRandomFilename($file->getClientOriginalExtension());
+            
+            // Check if the file was actually uploaded successfully
+            if (!$file->isValid()) {
+                return redirect()->back()->withErrors(['image' => 'File upload failed.'])->withInput();
+            }
+            
+            $path = $file->storeAs('img', $filename, 'public');  // Explicitly specify 'public' disk
+            if ($path === false) {
+                return redirect()->back()->withErrors(['image' => 'Failed to save image file.'])->withInput();
+            }
+            
+            // The storeAs method stores the file in storage/app/public/img/ and returns "img/filename"
+            // The storage link makes it accessible via /storage/img/filename
+            $data['image'] = '/storage/' . $path;
         }
 
-        $data['images'] = $imagePaths;
-        $data['main_image'] = !empty($imagePaths) ? $imagePaths[0] : null;
+        // Handle additional image uploads
+        for ($i = 2; $i <= 5; $i++) {
+            $imageField = "image$i";
+            if ($request->hasFile($imageField)) {
+                // Delete old image if exists
+                if ($product->$imageField) {
+                    $oldImagePath = str_replace('/storage/', 'public/', $product->$imageField);
+                    if (file_exists(storage_path('app/' . $oldImagePath))) {
+                        unlink(storage_path('app/' . $oldImagePath));
+                    }
+                }
+                
+                $file = $request->file($imageField);
+                $filename = $this->generateRandomFilename($file->getClientOriginalExtension());
+                
+                // Check if the file was actually uploaded successfully
+                if (!$file->isValid()) {
+                    return redirect()->back()->withErrors([$imageField => 'File upload failed.'])->withInput();
+                }
+                
+                $path = $file->storeAs('img', $filename, 'public');  // Explicitly specify 'public' disk
+                if ($path === false) {
+                    return redirect()->back()->withErrors([$imageField => 'Failed to save image file.'])->withInput();
+                }
+                
+                // The storeAs method stores the file in storage/app/public/img/ and returns "img/filename"
+                // The storage link makes it accessible via /storage/img/filename
+                $data[$imageField] = '/storage/' . $path;
+            }
+        }
 
         $product->update($data);
 
@@ -132,13 +210,18 @@ class ProductController extends BaseController
      */
     private function deleteProductImages($product)
     {
-        $images = $product->images;
-        foreach ($images as $image) {
-            // Remove the /storage/ prefix to get the actual file path
-            $filePath = str_replace('/storage/', 'public/', $image);
+        // Delete all 5 image columns if they exist
+        for ($i = 1; $i <= 5; $i++) {
+            $imageFieldName = $i === 1 ? 'image' : "image$i";
+            $imagePath = $product->$imageFieldName;
             
-            if (file_exists(storage_path('app/' . $filePath))) {
-                unlink(storage_path('app/' . $filePath));
+            if ($imagePath) {
+                // Remove the /storage/ prefix to get the actual file path
+                $filePath = str_replace('/storage/', 'public/', $imagePath);
+                
+                if (file_exists(storage_path('app/' . $filePath))) {
+                    unlink(storage_path('app/' . $filePath));
+                }
             }
         }
     }

@@ -45,23 +45,36 @@
                             <input type="number" name="disc_price" id="disc_price" step="0.01" value="{{ old('disc_price', $product->disc_price) }}" class="w-full px-4 py-3 bg-dark-light border border-gray-800 rounded-lg text-primary placeholder-secondary focus:outline-none focus:border-accent transition">
                         </div>
 
-                        <!-- Existing Images -->
-                        @if($product->images && count($product->images) > 0)
-                            <div>
-                                <label class="block text-sm font-medium text-secondary mb-2">Existing Images</label>
-                                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-                                    @foreach($product->images as $image)
+                        <!-- Current Images -->
+                        <div>
+                            <label class="block text-sm font-medium text-secondary mb-2">Current Images</label>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                @if($product->image)
+                                    <div class="relative">
+                                        <h3 class="text-sm font-medium text-secondary mb-1">Primary Image</h3>
+                                        <img src="{{ $product->image }}" alt="Primary Product Image" class="w-full h-32 object-cover rounded">
+                                        <a href="#" class="delete-image-btn text-red-500 text-sm mt-1 inline-block" data-field="image" data-product-id="{{ $product->id }}">Delete Image</a>
+                                    </div>
+                                @endif
+                                
+                                @for($i = 2; $i <= 5; $i++)
+                                    @php
+                                        $imageField = $i === 2 ? 'image2' : ($i === 3 ? 'image3' : ($i === 4 ? 'image4' : 'image5'));
+                                    @endphp
+                                    @if($product->$imageField)
                                         <div class="relative">
-                                            <img src="{{ $image }}" alt="Product Image" class="w-full h-24 object-cover rounded">
+                                            <h3 class="text-sm font-medium text-secondary mb-1">Image {{ $i }}</h3>
+                                            <img src="{{ $product->$imageField }}" alt="Product Image {{ $i }}" class="w-full h-32 object-cover rounded">
+                                            <a href="#" class="delete-image-btn text-red-500 text-sm mt-1 inline-block" data-field="{{ $imageField }}" data-product-id="{{ $product->id }}">Delete Image</a>
                                         </div>
-                                    @endforeach
-                                </div>
+                                    @endif
+                                @endfor
                             </div>
-                        @endif
+                        </div>
 
                         <!-- Image Upload Section -->
                         <div>
-                            <label class="block text-sm font-medium text-secondary mb-2">Add More Images (Max 5 images, 10MB each)</label>
+                            <label class="block text-sm font-medium text-secondary mb-2">Additional Images (Drag & Drop or Click - up to 5 images total)</label>
                             <div id="image-upload-area" class="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center cursor-pointer bg-dark-light hover:bg-gray-800 transition">
                                 <div class="flex flex-col items-center justify-center pt-5 pb-6">
                                     <i class="fas fa-cloud-upload-alt text-3xl text-gray-500 mb-3"></i>
@@ -69,15 +82,15 @@
                                         <span class="font-semibold">Click to upload</span> or drag and drop
                                     </p>
                                     <p class="text-xs text-gray-500">
-                                        PNG, JPG, JPEG, GIF, WEBP (MAX. 10MB)
+                                        PNG, JPG, JPEG, GIF, WEBP (MAX. 10MB each)
                                     </p>
                                 </div>
-                                <input type="file" name="images[]" id="images" class="hidden" accept="image/*" multiple>
+                                <input type="file" id="image-file-input" class="hidden" accept="image/*" multiple>
                             </div>
-                            <div id="image-preview-container" class="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 hidden">
-                                <!-- Preview images will be added here dynamically -->
+                            <div id="image-preview-container" class="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                                <!-- Image previews will be added here dynamically -->
                             </div>
-                            <p class="text-xs text-gray-500 mt-2">You can upload up to 5 images</p>
+                            <p class="text-xs text-gray-500 mt-2">Add more images. Drag to reorder. First image will be primary.</p>
                         </div>
 
                         <div>
@@ -113,112 +126,194 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const imageUploadArea = document.getElementById('image-upload-area');
-            const imageInput = document.getElementById('images');
-            const previewContainer = document.getElementById('image-preview-container');
+            const imageFileInput = document.getElementById('image-file-input');
+            const imagePreviewContainer = document.getElementById('image-preview-container');
+            
+            // Store uploaded files
+            let uploadedFiles = [];
 
-            // Handle click on upload area
-            imageUploadArea.addEventListener('click', function() {
-                imageInput.click();
-            });
+            if (imageUploadArea) {
+                // Handle click on upload area
+                imageUploadArea.addEventListener('click', function() {
+                    imageFileInput.click();
+                });
 
-            // Handle drag and drop events
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                imageUploadArea.addEventListener(eventName, preventDefaults, false);
-            });
+                // Handle drag and drop events
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    imageUploadArea.addEventListener(eventName, preventDefaults, false);
+                });
 
-            function preventDefaults(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
+                function preventDefaults(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
 
-            ['dragenter', 'dragover'].forEach(eventName => {
-                imageUploadArea.addEventListener(eventName, highlight, false);
-            });
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    imageUploadArea.addEventListener(eventName, highlight, false);
+                });
 
-            ['dragleave', 'drop'].forEach(eventName => {
-                imageUploadArea.addEventListener(eventName, unhighlight, false);
-            });
+                ['dragleave', 'drop'].forEach(eventName => {
+                    imageUploadArea.addEventListener(eventName, unhighlight, false);
+                });
 
-            function highlight(e) {
-                imageUploadArea.classList.add('border-accent', 'bg-gray-800');
-            }
+                function highlight(e) {
+                    imageUploadArea.classList.add('border-accent', 'bg-gray-800');
+                }
 
-            function unhighlight(e) {
-                imageUploadArea.classList.remove('border-accent', 'bg-gray-800');
-            }
+                function unhighlight(e) {
+                    imageUploadArea.classList.remove('border-accent', 'bg-gray-800');
+                }
 
-            // Handle dropped files
-            imageUploadArea.addEventListener('drop', function(e) {
-                const dt = e.dataTransfer;
-                const files = dt.files;
-                handleFiles(files);
-            });
+                // Handle dropped files
+                imageUploadArea.addEventListener('drop', function(e) {
+                    const dt = e.dataTransfer;
+                    handleFiles(dt.files);
+                });
 
-            // Handle file selection
-            imageInput.addEventListener('change', function() {
-                handleFiles(this.files);
-            });
+                // Handle file selection
+                imageFileInput.addEventListener('change', function() {
+                    handleFiles(this.files);
+                });
 
-            // Handle files function
-            function handleFiles(files) {
-                // Clear existing previews
-                previewContainer.innerHTML = '';
+                // Handle files function
+                function handleFiles(files) {
+                    // Convert files to array and validate
+                    const filesArray = Array.from(files);
+                    
+                    // Validate files and filter valid ones
+                    const validFiles = [];
+                    for (let i = 0; i < filesArray.length; i++) {
+                        const file = filesArray[i];
+                        if (file.type.match('image.*') && file.size <= 10 * 1024 * 1024) { // 10MB limit
+                            validFiles.push(file);
+                        }
+                    }
+                    
+                    // Check if adding these files would exceed the limit
+                    if (uploadedFiles.length + validFiles.length > 5) {
+                        const remainingSlots = 5 - uploadedFiles.length;
+                        if (remainingSlots > 0) {
+                            alert(`You can only upload up to 5 images. Adding ${validFiles.length} images would exceed the limit. Only adding ${remainingSlots} more image(s).`);
+                            validFiles.splice(remainingSlots);
+                        } else {
+                            alert('You have reached the maximum of 5 images.');
+                            return;
+                        }
+                    }
+                    
+                    // Add valid files to the uploadedFiles array
+                    uploadedFiles.push(...validFiles);
+                    
+                    // Update previews
+                    updatePreviews();
+                }
                 
-                // Validate file count and type
-                let validFiles = [];
-                for (let i = 0; i < files.length && i < 5; i++) {
-                    const file = files[i];
-                    if (file.type.match('image.*') && file.size <= 10 * 1024 * 1024) { // 10MB limit
-                        validFiles.push(file);
+                // Update previews function
+                function updatePreviews() {
+                    // Clear existing previews
+                    imagePreviewContainer.innerHTML = '';
+                    
+                    // Create preview for each uploaded file
+                    uploadedFiles.forEach((file, index) => {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(e) {
+                            const previewElement = document.createElement('div');
+                            previewElement.className = 'relative group';
+                            previewElement.setAttribute('data-index', index);
+                            previewElement.innerHTML = `
+                                <div class="relative">
+                                    <img src="${e.target.result}" alt="Preview ${index + 1}" class="w-full h-24 object-cover rounded cursor-move" draggable="true">
+                                    <button type="button" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 delete-image" data-index="${index}">×</button>
+                                    <span class="absolute bottom-0 left-0 bg-black bg-opacity-50 text-white text-xs px-1 rounded">${index + 1}</span>
+                                </div>
+                            `;
+                            
+                            // Add drag and drop events for reordering
+                            previewElement.addEventListener('dragstart', handleDragStart);
+                            previewElement.addEventListener('dragover', handleDragOver);
+                            previewElement.addEventListener('dragenter', handleDragEnter);
+                            previewElement.addEventListener('dragleave', handleDragLeave);
+                            previewElement.addEventListener('drop', handleDrop);
+                            previewElement.addEventListener('dragend', handleDragEnd);
+                            
+                            // Add delete event
+                            previewElement.querySelector('.delete-image').addEventListener('click', function() {
+                                const fileIndex = parseInt(this.getAttribute('data-index'));
+                                deleteImage(fileIndex);
+                            });
+                            
+                            imagePreviewContainer.appendChild(previewElement);
+                        };
+                        
+                        reader.readAsDataURL(file);
+                    });
+                }
+                
+                // Variables for drag and drop
+                let dragSrcElement = null;
+                
+                // Drag and drop functions
+                function handleDragStart(e) {
+                    dragSrcElement = this;
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', this.getAttribute('data-index'));
+                }
+                
+                function handleDragOver(e) {
+                    if (e.preventDefault) {
+                        e.preventDefault();
+                    }
+                    e.dataTransfer.dropEffect = 'move';
+                    return false;
+                }
+                
+                function handleDragEnter(e) {
+                    this.classList.add('border-2 border-accent');
+                }
+                
+                function handleDragLeave(e) {
+                    this.classList.remove('border-2 border-accent');
+                }
+                
+                function handleDrop(e) {
+                    if (e.stopPropagation) {
+                        e.stopPropagation();
+                    }
+                    
+                    this.classList.remove('border-2 border-accent');
+                    
+                    if (dragSrcElement !== this) {
+                        // Get indices
+                        const srcIndex = parseInt(dragSrcElement.getAttribute('data-index'));
+                        const destIndex = parseInt(this.getAttribute('data-index'));
+                        
+                        // Reorder in the array
+                        const movedFile = uploadedFiles[srcIndex];
+                        uploadedFiles.splice(srcIndex, 1);
+                        uploadedFiles.splice(destIndex, 0, movedFile);
+                        
+                        // Update previews
+                        updatePreviews();
+                    }
+                    
+                    return false;
+                }
+                
+                function handleDragEnd(e) {
+                    // Remove any highlighting
+                    const items = document.querySelectorAll('#image-preview-container > div');
+                    for (let i = 0; i < items.length; i++) {
+                        items[i].classList.remove('border-2 border-accent');
                     }
                 }
                 
-                // Create new DataTransfer to hold valid files
-                const dataTransfer = new DataTransfer();
-                validFiles.forEach(file => dataTransfer.items.add(file));
-                imageInput.files = dataTransfer.files;
-                
-                // Create previews
-                validFiles.forEach((file, index) => {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const previewElement = document.createElement('div');
-                        previewElement.className = 'relative';
-                        previewElement.innerHTML = `
-                            <img src="${e.target.result}" alt="Preview" class="w-full h-24 object-cover rounded">
-                            <button type="button" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs remove-image" data-index="${index}">×</button>
-                        `;
-                        
-                        previewContainer.appendChild(previewElement);
-                        
-                        // Add event listener to remove button
-                        previewElement.querySelector('.remove-image').addEventListener('click', function(e) {
-                            e.stopPropagation();
-                            previewElement.remove();
-                            
-                            // Update file input
-                            const dt = new DataTransfer();
-                            Array.from(imageInput.files).forEach((f, i) => {
-                                if (i !== index) {
-                                    dt.items.add(f);
-                                }
-                            });
-                            imageInput.files = dt.files;
-                            
-                            // Hide preview container if no images
-                            if (dt.files.length === 0) {
-                                previewContainer.classList.add('hidden');
-                            }
-                        });
-                    };
-                    reader.readAsDataURL(file);
-                });
-                
-                // Show preview container if we have valid files
-                if (validFiles.length > 0) {
-                    previewContainer.classList.remove('hidden');
-                } else {
-                    previewContainer.classList.add('hidden');
+                // Delete image function
+                function deleteImage(index) {
+                    if (confirm('Are you sure you want to remove this image?')) {
+                        uploadedFiles.splice(index, 1);
+                        updatePreviews();
+                    }
                 }
             }
         });

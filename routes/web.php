@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Public routes
+Route::get('/products', [HomeController::class, 'products'])->name('products.index');
 Route::get('/products/search', [HomeController::class, 'search'])->name('products.search');
 
 // Authenticated user routes
@@ -24,13 +25,16 @@ Route::middleware(['auth'])->group(function () {
         return view('dashboard');
     })->name('dashboard');
     
-    // User can only access cart functionality
+
+    
+    // Cart functionality
     Route::prefix('cart')->name('cart.')->group(function () {
         Route::get('/', [CartController::class, 'index'])->name('index');
         Route::post('/add/{product}', [CartController::class, 'add'])->name('add');
         Route::put('/update/{id}', [CartController::class, 'update'])->name('update');
         Route::delete('/remove/{id}', [CartController::class, 'remove'])->name('remove');
         Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
+        Route::get('/count', [CartController::class, 'count'])->name('count');
     });
     
     // Profile routes
@@ -50,6 +54,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('carts', [AdminCartController::class, 'index'])->name('carts.index');
     Route::get('carts/user/{user}', [AdminCartController::class, 'showByUser'])->name('carts.show');
     Route::delete('carts/{id}', [AdminCartController::class, 'destroy'])->name('carts.destroy');
+    
+
 });
 
 require __DIR__.'/auth.php';

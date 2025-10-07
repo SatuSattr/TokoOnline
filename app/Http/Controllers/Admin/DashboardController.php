@@ -6,6 +6,7 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Product;
+use App\Models\Category;
 use App\Models\Cart;
 
 class DashboardController extends BaseController
@@ -19,9 +20,10 @@ class DashboardController extends BaseController
     {
         $usersCount = User::count();
         $productsCount = Product::count();
+        $categoriesCount = Category::count();
         $cartsCount = Cart::count();
         $totalRevenue = 0; // This would be calculated based on orders in a real app
 
-        return view('admin.dashboard.index', compact('usersCount', 'productsCount', 'cartsCount', 'totalRevenue'));
+        return view('admin.dashboard.index', compact('usersCount', 'productsCount', 'categoriesCount', 'cartsCount', 'totalRevenue'));
     }
 }
