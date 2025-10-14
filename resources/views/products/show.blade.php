@@ -77,6 +77,13 @@
                             {{ $product->reviews }} reviews</span>
                     </div>
 
+                    <div class="mb-6">
+                        <span class="text-secondary text-sm uppercase">Dijual oleh</span>
+                        <div class="text-lg font-semibold text-primary">
+                            {{ $product->seller_name }}
+                        </div>
+                    </div>
+
                     <!-- Price -->
                     <div class="mb-8">
                         <div class="flex items-baseline gap-4">

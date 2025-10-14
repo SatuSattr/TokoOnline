@@ -11,6 +11,7 @@ class User extends Authenticatable
 {
     const ROLE_USER = 1;
     const ROLE_ADMIN = 2;
+    const ROLE_SELLER = 3;
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -67,6 +68,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if the user is a seller
+     */
+    public function isSeller(): bool
+    {
+        return $this->role === self::ROLE_SELLER;
+    }
+
+    /**
      * Get the cart items for the user.
      */
     public function cartItems()
@@ -74,5 +83,27 @@ class User extends Authenticatable
         return $this->hasMany(Cart::class);
     }
 
+    /**
+     * Products owned by the user (when seller).
+     */
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
 
+    /**
+     * Orders created by the user (as buyer).
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Orders received by the user (as seller).
+     */
+    public function receivedOrders()
+    {
+        return $this->hasMany(Order::class, 'seller_id');
+    }
 }

@@ -14,3 +14,5 @@ aku ingin saat user malakukan checkout, data tersebut akan masuk ke table orders
 maka data order akan dibuat untuk setiap item yang dicheckout
 misal user melakukan checkout pada 3 item sekaligus, ketiga item ini memiliki seller yang berbeda, nah saat sudah mengisi form checkout dan menekan tombol checkout
 data order tiap product nya akan masuk satu persatu ke tabel orders dengan product_id yang sesuai dengan tiap product dan user_id yang berisikan id dari user yang melakukan order
+
+dengan begitu tiap product memilki penjualnya, dan aku ingin kamu menampilkan nama toko dari si penjual pada tiap card products.

@@ -44,6 +44,7 @@
                             <label for="role" class="block text-sm font-medium text-secondary mb-2">Role</label>
                             <select name="role" id="role" class="w-full px-4 py-3 bg-dark-light border border-gray-800 rounded-lg text-primary focus:outline-none focus:border-accent transition" required>
                                 <option value="1" {{ $user->role == 1 ? 'selected' : '' }}>User</option>
+                                <option value="3" {{ $user->role == 3 ? 'selected' : '' }}>Seller</option>
                                 <option value="2" {{ $user->role == 2 ? 'selected' : '' }}>Admin</option>
                             </select>
                         </div>

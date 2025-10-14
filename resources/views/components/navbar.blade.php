@@ -13,6 +13,10 @@
                             <a href="{{ route('admin.dashboard') }}"
                                 class="{{ request()->routeIs('admin.*') ? 'text-primary' : 'text-neutral-400' }} hover:text-primary transition">Admin
                                 Dashboard</a>
+                        @elseif (auth()->user()->isSeller())
+                            <a href="{{ route('seller.dashboard') }}"
+                                class="{{ request()->routeIs('seller.*') ? 'text-primary' : 'text-neutral-400' }} hover:text-primary transition">Seller
+                                Dashboard</a>
                         @endif
                     @endauth
                 </div>
@@ -44,6 +48,16 @@
                             class="absolute right-0 mt-2 w-48 bg-dark-light border border-gray-800 rounded-md shadow-lg py-1 z-50 hidden">
                             <a href="{{ route('profile.edit') }}"
                                 class="block px-4 py-2 text-sm text-primary hover:bg-gray-800">Profile</a>
+                            <a href="{{ route('orders.index') }}"
+                                class="block px-4 py-2 text-sm text-primary hover:bg-gray-800">Orders</a>
+                            @if (auth()->user()->isSeller())
+                                <a href="{{ route('seller.dashboard') }}"
+                                    class="block px-4 py-2 text-sm text-primary hover:bg-gray-800">Seller Dashboard</a>
+                                <a href="{{ route('seller.products.index') }}"
+                                    class="block px-4 py-2 text-sm text-primary hover:bg-gray-800">Seller Products</a>
+                                <a href="{{ route('seller.orders.index') }}"
+                                    class="block px-4 py-2 text-sm text-primary hover:bg-gray-800">Seller Orders</a>
+                            @endif
                             <a href="{{ route('cart.index') }}"
                                 class="block px-4 py-2 text-sm text-primary hover:bg-gray-800">Cart</a>
                             <form method="POST" action="{{ route('logout') }}">

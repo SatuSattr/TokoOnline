@@ -42,6 +42,7 @@
                             <label for="role" class="block text-sm font-medium text-secondary mb-2">Role</label>
                             <select name="role" id="role" class="w-full px-4 py-3 bg-dark-light border border-gray-800 rounded-lg text-primary focus:outline-none focus:border-accent transition" required>
                                 <option value="1">User</option>
+                                <option value="3">Seller</option>
                                 <option value="2">Admin</option>
                             </select>
                         </div>

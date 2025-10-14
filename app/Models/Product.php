@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
     protected $fillable = [
         'name',
         'category_id',
+        'user_id',
         'price',
         'disc_price',
         'image',
@@ -31,6 +33,14 @@ class Product extends Model
     }
 
     /**
+     * Seller (owner) relationship.
+     */
+    public function seller(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
      * Get the category name attribute.
      */
     public function getCategoryNameAttribute(): string
@@ -49,11 +59,19 @@ class Product extends Model
     /**
      * Get the cart items for this product.
      */
-    public function cartItems()
+    public function cartItems(): HasMany
     {
         return $this->hasMany(Cart::class);
     }
-    
+
+    /**
+     * Orders that include this product.
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
     
     /**
      * Get all images as an array for compatibility
@@ -192,5 +210,13 @@ class Product extends Model
     public function getFormattedOriginalPriceAttribute(): string
     {
         return 'Rp' . number_format($this->price, 0, ',', '.');
+    }
+
+    /**
+     * Convenience accessor for seller name.
+     */
+    public function getSellerNameAttribute(): string
+    {
+        return $this->seller?->name ?? 'Toko';
     }
 }

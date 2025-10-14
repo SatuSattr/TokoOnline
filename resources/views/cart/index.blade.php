@@ -75,11 +75,14 @@
                                                             <div class="text-sm text-secondary">
                                                                 {{ $item->product->getCategoryDisplayNameAttribute() }}
                                                             </div>
+                                                            <div class="text-xs text-secondary mt-1">
+                                                                Seller: {{ $item->product->seller_name }}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-primary">
-                                                    {{ $item->product->getFormattedPriceAttribute() }}
+                                                    {{ $item->product->getFormattedOriginalPriceAttribute() }}
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                                     <div
@@ -188,7 +191,7 @@
                                 <label for="address" class="block text-sm font-medium text-secondary mb-2">
                                     Delivery Address <span class="text-red-500">*</span>
                                 </label>
-                                <textarea id="address"
+                                <textarea id="address" x-model="shippingAddress"
                                     class="w-full px-4 py-3 bg-dark-light border border-gray-800 rounded-lg text-primary placeholder-secondary focus:outline-none focus:border-accent transition"
                                     placeholder="Enter your complete delivery address" rows="3"></textarea>
                             </div>
@@ -221,18 +224,28 @@
                                     <option value="COD">Cash on Delivery (COD)</option>
                                 </select>
                             </div>
+
+                            <!-- Additional Notes -->
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-secondary mb-2">
+                                    Order Notes
+                                </label>
+                                <textarea x-model="notes"
+                                    class="w-full px-4 py-3 bg-dark-light border border-gray-800 rounded-lg text-primary placeholder-secondary focus:outline-none focus:border-accent transition"
+                                    placeholder="Add notes for the seller (optional)" rows="2"></textarea>
+                            </div>
                         </div>
 
-                        <button @click="proceedToCheckout" :disabled="selectedCount === 0"
+                        <button @click="proceedToCheckout" :disabled="selectedCount === 0 || isSubmitting"
                             :class="{
-                                'bg-primary/70 cursor-not-allowed': selectedCount ===
-                                    0,
-                                'bg-primary hover:bg-gray-200': selectedCount > 0
+                                'bg-primary/70 cursor-not-allowed': selectedCount === 0 || isSubmitting,
+                                'bg-primary hover:bg-gray-200': selectedCount > 0 && !isSubmitting
                             }"
                             class="w-full text-dark px-6 py-4 rounded-lg transition font-medium">
                             <span x-show="selectedCount === 0">Select Items to Checkout</span>
-                            <span x-show="selectedCount > 0"
+                            <span x-show="selectedCount > 0 && !isSubmitting"
                                 x-text="`Checkout (${selectedCount} item${selectedCount > 1 ? 's' : ''})`"></span>
+                            <span x-show="isSubmitting">Processing...</span>
                         </button>
                         <div class="flex items-center justify-between mt-4">
                             <button @click="clearSelection"
@@ -254,16 +267,21 @@
         function cartApp() {
             return {
                 selectedItems: [],
-                cartItems: [],
+                shippingAddress: '',
+                notes: '',
+                isSubmitting: false,
                 shippingFee: 0,
                 shippingMethod: '',
                 paymentMethod: '',
+                cartItemIds: [
+                    @foreach ($cartItems as $item)
+                        {{ $item->id }},
+                    @endforeach
+                ],
 
                 init() {
                     // Initialize selected items with all items checked by default
-                    @foreach ($cartItems as $item)
-                        this.selectedItems.push({{ $item->id }});
-                    @endforeach
+                    this.selectedItems = [...this.cartItemIds];
                 },
 
                 get selectedCount() {
@@ -336,15 +354,10 @@
                 },
 
                 toggleSelectAll() {
-                    const allCheckboxElements = document.querySelectorAll('.cart-item-checkbox:not(:checked)');
-                    if (allCheckboxElements.length > 0) {
-                        // Check all
-                        @foreach ($cartItems as $item)
-                            this.selectedItems.push({{ $item->id }});
-                        @endforeach
-                    } else {
-                        // Uncheck all
+                    if (this.selectedItems.length === this.cartItemIds.length) {
                         this.selectedItems = [];
+                    } else {
+                        this.selectedItems = [...this.cartItemIds];
                     }
                 },
 
@@ -411,7 +424,8 @@
                                 if (row) {
                                     row.remove();
                                 }
-                                // Remove from selected items if present
+                                // Remove from local collections
+                                this.cartItemIds = this.cartItemIds.filter(item => item !== cartId);
                                 this.selectedItems = this.selectedItems.filter(item => item !== cartId);
                             })
                             .catch(error => {
@@ -426,8 +440,17 @@
                 },
 
                 proceedToCheckout() {
+                    if (this.isSubmitting) {
+                        return;
+                    }
+
                     if (this.selectedCount === 0) {
                         alert('Please select at least one item to checkout.');
+                        return;
+                    }
+
+                    if (!this.shippingAddress.trim()) {
+                        alert('Please enter your delivery address.');
                         return;
                     }
 
@@ -441,13 +464,39 @@
                         return;
                     }
 
-                    // Here you would process the checkout
-                    console.log('Proceeding to checkout with:', {
-                        selectedItems: this.selectedItems,
-                        shippingMethod: this.shippingMethod,
-                        paymentMethod: this.paymentMethod,
-                        total: this.total
-                    });
+                    this.isSubmitting = true;
+
+                    fetch('/checkout', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                    'content'),
+                            },
+                            body: JSON.stringify({
+                                items: this.selectedItems,
+                                shipping_address: this.shippingAddress.trim(),
+                                shipping_method: this.shippingMethod,
+                                payment_method: this.paymentMethod,
+                                notes: this.notes.trim() || null,
+                            })
+                        })
+                        .then(async response => {
+                            const data = await response.json().catch(() => ({}));
+                            if (!response.ok) {
+                                throw new Error(data.message || 'Checkout gagal. Silakan coba lagi.');
+                            }
+                            return data;
+                        })
+                        .then(data => {
+                            const redirectUrl = data.redirect_url || '/orders';
+                            window.location.href = redirectUrl;
+                        })
+                        .catch(error => {
+                            this.isSubmitting = false;
+                            alert(error.message);
+                        });
                 },
 
                 formatCurrency(amount) {

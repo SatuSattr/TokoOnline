@@ -15,7 +15,7 @@ class HomeController extends BaseController
         $categories = Category::all();
         
         // Get featured products (top 8 by rating)
-        $featuredProducts = Product::with('category')
+        $featuredProducts = Product::with(['category', 'seller'])
             ->orderBy('rating', 'desc')
             ->limit(8)
             ->get();
@@ -31,7 +31,7 @@ class HomeController extends BaseController
         $categories = Category::all();
         
         // Search products by name or description
-        $featuredProducts = Product::with('category')
+        $featuredProducts = Product::with(['category', 'seller'])
             ->where(function($query) use ($search) {
                 $query->where('name', 'LIKE', "%{$search}%")
                       ->orWhere('description', 'LIKE', "%{$search}%");
@@ -49,13 +49,14 @@ class HomeController extends BaseController
         $categories = Category::all();
         
         // Get all products with category information
-        $products = Product::with('category')->paginate(12); // 12 products per page
+        $products = Product::with(['category', 'seller'])->paginate(12); // 12 products per page
 
         return view('products.index', compact('products', 'categories'));
     }
     
     public function product(Product $product)
     {
+        $product->load(['seller', 'category']);
         // Get related products (same category, excluding current product)
         $relatedProducts = Product::where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)

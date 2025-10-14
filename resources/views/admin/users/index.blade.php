@@ -57,6 +57,9 @@
                                         @if ($user->role == 1)
                                             <span
                                                 class="px-2 py-1 bg-blue-500 bg-opacity-20 text-white rounded-full text-xs">User</span>
+                                        @elseif($user->role == 3)
+                                            <span
+                                                class="px-2 py-1 bg-green-500 bg-opacity-20 text-white rounded-full text-xs">Seller</span>
                                         @elseif($user->role == 2)
                                             <span
                                                 class="px-2 py-1 bg-red-500 bg-opacity-20 text-white rounded-full text-xs">Admin</span>

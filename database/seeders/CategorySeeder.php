@@ -13,24 +13,24 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        Category::create([
-            'name' => 'electronics',
-            'display_name' => 'Electronics'
-        ]);
+        Category::updateOrCreate(
+            ['name' => 'electronics'],
+            ['display_name' => 'Electronics']
+        );
         
-        Category::create([
-            'name' => 'sports',
-            'display_name' => 'Sports'
-        ]);
+        Category::updateOrCreate(
+            ['name' => 'sports'],
+            ['display_name' => 'Sports']
+        );
         
-        Category::create([
-            'name' => 'clothing',
-            'display_name' => 'Clothing'
-        ]);
+        Category::updateOrCreate(
+            ['name' => 'clothing'],
+            ['display_name' => 'Clothing']
+        );
         
-        Category::create([
-            'name' => 'books',
-            'display_name' => 'Books'
-        ]);
+        Category::updateOrCreate(
+            ['name' => 'books'],
+            ['display_name' => 'Books']
+        );
     }
 }

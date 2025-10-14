@@ -41,6 +41,9 @@
                                     Category</th>
                                 <th
                                     class="px-6 py-4 text-left text-xs font-medium text-secondary uppercase tracking-wider">
+                                    Seller</th>
+                                <th
+                                    class="px-6 py-4 text-left text-xs font-medium text-secondary uppercase tracking-wider">
                                     Price</th>
                                 <th
                                     class="px-6 py-4 text-left text-xs font-medium text-secondary uppercase tracking-wider">
@@ -74,6 +77,9 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-primary">
                                         {{ $product->category ? $product->category->name : 'N/A' }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-primary">
+                                        {{ $product->seller_name }}
+                                    </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-primary">
                                         {{ $product->getFormattedPriceAttribute() }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-primary">
