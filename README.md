@@ -1,4 +1,4 @@
-# 🛍️ TokoOnline — Laravel E‑Commerce
+# 🛍️ TokoOnline — Simple E‑Commerce website that's barely works
 
 TokoOnline adalah aplikasi marketplace sederhana berbasis Laravel 12 dengan tampilan modern (TailwindCSS + Vite). Proyek ini mendukung tiga peran utama:
 
