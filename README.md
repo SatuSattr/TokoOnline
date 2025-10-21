@@ -10,6 +10,25 @@ Dengan arsitektur yang rapi dan komponen UI ringan (Alpine.js), TokoOnline cocok
 
 ---
 
+## 📸 Galeri Antarmuka
+
+<table>
+  <tr>
+    <td><img src="screenshots/1.png" /></td>
+    <td><img src="screenshots/2.png" /></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/3.png" /></td>
+    <td><img src="screenshots/4.png" /></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/5.png" /></td>
+    <td><img src="screenshots/6.png" /></td>
+  </tr>
+</table>
+
+---
+
 ## ✨ Fitur Utama
 
 -   👤 Autentikasi berbasis peran (Admin, Seller, User) via Laravel Breeze.
@@ -90,24 +109,6 @@ Login sebagai Admin/Seller untuk mengakses dashboard masing‑masing. Akun User 
 
 ---
 
-## 📸 Galeri Antarmuka
-
-<table>
-  <tr>
-    <td><img src="screenshots/1.png" /></td>
-    <td><img src="screenshots/2.png" /></td>
-  </tr>
-  <tr>
-    <td><img src="screenshots/3.png" /></td>
-    <td><img src="screenshots/4.png" /></td>
-  </tr>
-  <tr>
-    <td><img src="screenshots/5.png" /></td>
-    <td><img src="screenshots/6.png" /></td>
-  </tr>
-</table>
-
----
 
 ## 🧪 Testing
 
