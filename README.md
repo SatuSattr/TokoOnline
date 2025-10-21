@@ -1,61 +1,127 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🛍️ TokoOnline — Laravel E‑Commerce
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+TokoOnline adalah aplikasi marketplace sederhana berbasis Laravel 12 dengan tampilan modern (TailwindCSS + Vite). Proyek ini mendukung tiga peran utama:
 
-## About Laravel
+- Admin — kelola produk, kategori, pengguna, serta memantau keranjang pengguna.
+- Seller — kelola produk sendiri dan memproses pesanan yang masuk.
+- User — jelajah katalog, tambah ke keranjang, checkout, dan pantau pesanan.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Dengan arsitektur yang rapi dan komponen UI ringan (Alpine.js), TokoOnline cocok untuk pembelajaran maupun pondasi proyek e‑commerce skala kecil-menengah.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## ✨ Fitur Utama
 
-## Learning Laravel
+- 👤 Autentikasi berbasis peran (Admin, Seller, User) via Laravel Breeze.
+- 🛍️ Katalog produk + kategori: daftar, detail, produk terkait, rating dan harga diskon.
+- 🔎 Pencarian produk cepat dari halaman utama.
+- 🧺 Keranjang belanja: tambah, ubah jumlah, hapus item, dan bersihkan keranjang (AJAX endpoint + counter).
+- 💳 Checkout & pesanan: input alamat, metode kirim & bayar, pembuatan pesanan per item.
+- 🧑‍💼 Dashboard Seller: ringkasan metrik, kelola produk, dan update status pesanan.
+- 🛠️ Panel Admin: kelola produk, kategori, pengguna, serta pantau data keranjang.
+- ⚡ Build modern dengan Vite, TailwindCSS, Alpine.js, dan Axios.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 🛠️ Teknologi
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Laravel 12, PHP ≥ 8.2
+- Laravel Breeze (Blade + Tailwind)
+- Vite, TailwindCSS, Alpine.js, Axios
+- SQLite (default), dapat diganti ke MySQL/PostgreSQL
+- Pest / PHPUnit untuk testing
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🚀 Instalasi & Setup
 
-### Premium Partners
+Persyaratan: PHP ≥ 8.2, Composer, Node.js ≥ 18, npm
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+# 1) Install dependensi PHP
+composer install
 
-## Contributing
+# 2) Salin env & generate app key
+cp .env.example .env
+php artisan key:generate
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# 3) Siapkan database SQLite (opsi default)
+touch database/database.sqlite
 
-## Code of Conduct
+# 4) Migrasi & seeding data awal
+php artisan migrate
+php artisan db:seed
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# (Opsional tapi direkomendasikan) Link penyimpanan publik untuk upload gambar
+php artisan storage:link
 
-## Security Vulnerabilities
+# 5) Install dependensi frontend
+npm install
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# 6) Jalankan aplikasi (pilih salah satu)
+# Opsi A: semua sekaligus (server + queue + Vite)
+composer dev
 
-## License
+# Opsi B: jalankan terpisah
+php artisan serve
+npm run dev
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Catatan:
+- Konfigurasi lingkungan ada di `.env` (lihat contoh di `.env.example`).
+- Secara default, `DB_CONNECTION=sqlite`. Untuk database lain, sesuaikan kredensial dan jalankan ulang migrasi.
+- Jika menggunakan `SESSION_DRIVER=database`, pastikan tabel `sessions` tersedia (jalankan `php artisan session:table` lalu `php artisan migrate` bila diperlukan).
+ - Untuk fitur upload gambar (Seller), jalankan `php artisan storage:link` agar file tersaji melalui `/storage`.
+ - Jika menggunakan `SESSION_DRIVER=database`, pastikan tabel `sessions` tersedia (jalankan `php artisan session:table` lalu `php artisan migrate` bila diperlukan).
+
+---
+
+## 🔑 Kredensial Default (Seeder)
+
+| Peran   | Email                     | Password   |
+| ------- | ------------------------- | ---------- |
+| Admin   | `admin@tokoonline.test`   | `password` |
+| Seller  | `seller1@tokoonline.test` | `password` |
+| Seller  | `seller2@tokoonline.test` | `password` |
+| User    | `test@example.com`        | `password` |
+
+Login sebagai Admin/Seller untuk mengakses dashboard masing‑masing. Akun User dapat berbelanja dan checkout.
+
+---
+
+## 📸 Galeri Antarmuka
+
+<table>
+  <tr>
+    <td><img src="https://placehold.co/600x350?text=Home" alt="Home" /></td>
+    <td><img src="https://placehold.co/600x350?text=Daftar+Produk" alt="Daftar Produk" /></td>
+  </tr>
+  <tr>
+    <td><img src="https://placehold.co/600x350?text=Detail+Produk" alt="Detail Produk" /></td>
+    <td><img src="https://placehold.co/600x350?text=Keranjang" alt="Keranjang" /></td>
+  </tr>
+  <tr>
+    <td><img src="https://placehold.co/600x350?text=Checkout" alt="Checkout" /></td>
+    <td><img src="https://placehold.co/600x350?text=Dashboard+Admin" alt="Dashboard Admin" /></td>
+  </tr>
+</table>
+
+---
+
+## 🧪 Testing
+
+Jalankan seluruh test:
+
+```bash
+php artisan test
+```
+
+---
+
+## 🤝 Kontribusi
+
+Saran fitur, perbaikan bug, atau peningkatan UI/UX sangat dipersilakan. Silakan buat issue atau pull request.
+
+---
+
+Selamat menggunakan TokoOnline! 🚀
